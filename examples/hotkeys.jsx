@@ -15,12 +15,16 @@ const keyMap = {
 };
 
 class App extends Component {
+  componentDidMount() {
+    this._hotkeysContainer && this._hotkeysContainer.focus();
+  }
+
   render() {
     const handlers = {
       quit: () => {process.exit();}
     };
     return (
-      <HotKeys keyMap={keyMap} handlers={handlers}>
+      <HotKeys keyMap={keyMap} handlers={handlers} innerRef={c => this._hotkeysContainer = c}>
         <box label="react-blessed demo"
              border={{type: 'line'}}
              style={{border: {fg: 'cyan'}}}>
@@ -37,4 +41,8 @@ const screen = blessed.screen({
   title: 'press q to quit'
 });
 
+screen.enableInput();
+screen.key(['C-c'], (ch, key) => {process.exit();});
+
+global.window = screen;
 const component = render(<App />, screen);
