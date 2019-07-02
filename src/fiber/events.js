@@ -35,5 +35,40 @@ const eventListener = (node, event, ...args) => {
   }
 };
 
+export function updateEventRegistrations(root, instance, props) {
+  // TODO(shaheen) remove current registrations not appearing in props
+  for (var propKey in props) {
+    //if (registrationNameModules.hasOwnProperty(propKey)) {
+      console.log(propKey);
+    //}
+  }
+}
+
+
+
+function nativeEventToSyntheticEvent(evt) {
+
+}
+
+function dispatchNativeEvent(root, evt) {
+  // TODO(shaheen) transform event to SyntheticEvent
+  // TODO(shaheen) implement react event capture/bubble phases
+}
+
+export class ReactBlessedEventListener {
+  constructor(root, screen) {
+    this.root = root;
+    this.screen = screen;
+    this._installListeners();
+  }
+
+  _installListeners() {
+  }
+
+  _removeListeners() {
+
+  }
+}
+
 export default eventListener;
 

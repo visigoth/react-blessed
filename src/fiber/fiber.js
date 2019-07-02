@@ -1,7 +1,7 @@
 /* @flow */
 import type { HostConfig, Reconciler } from 'react-fiber-types';
 import ReactFiberReconciler from 'react-reconciler'
-import eventListener from './events'
+import eventListener, { ReactBlessedEventListener, updateEventRegistrations } from './events'
 import update from '../shared/update'
 import solveClass from '../shared/solveClass'
 import debounce from 'lodash/debounce'
@@ -46,10 +46,9 @@ export const createBlessedRenderer = function(blessed) {
       if (type.startsWith(blessedTypePrefix)) {
         type = type.slice(blessedTypePrefix.length);
       }
+
       const instance = blessed[type](appliedProps);
       instance.props = props;
-      instance._eventListener = (...args) => eventListener(instance, ...args);
-      instance.on('event', instance._eventListener);
 
       return instance;
     },
@@ -69,6 +68,7 @@ export const createBlessedRenderer = function(blessed) {
     ) : boolean {
       const {children, ...appliedProps} = solveClass(props);
       update(instance, appliedProps);
+      updateEventRegistrations(rootContainerInstance, instance, appliedProps);
       instance.props = props;
       return false;
     },
@@ -188,7 +188,7 @@ export const createBlessedRenderer = function(blessed) {
       child : Instance | TextInstance
     ) : void {
       parentInstance.remove(child);
-      child.off('event', child._eventListener);
+      //child.off('event', child._eventListener);
       child.destroy();
     },
 
@@ -197,7 +197,7 @@ export const createBlessedRenderer = function(blessed) {
       child : Instance | TextInstance
     ) : void {
       parentInstance.remove(child);
-      child.off('event', child._eventListener);
+      //child.off('event', child._eventListener);
       child.destroy();
     },
 
@@ -227,6 +227,14 @@ export const createBlessedRenderer = function(blessed) {
     if (!root) {
       root = BlessedReconciler.createContainer(screen);
       roots.set(screen, root);
+
+      // TODO(shaheen): install top level event listener on the screen for all
+      // events that could/should be synthesized.
+      root._eventListener = new ReactBlessedEventListener(root, screen);
+
+      // TODO(shaheen): event listener should implement react capture/bubble algorithm
+      // and emit appropriate react events to elements along the path
+
     }
 
     // render at most every 16ms. Should sync this with the screen refresh rate
