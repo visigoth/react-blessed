@@ -11,7 +11,7 @@ configure({
 });
 
 const keyMap = {
-  quit: ['q']
+  'quit': ['q']
 };
 
 class App extends Component {
@@ -21,7 +21,9 @@ class App extends Component {
 
   render() {
     const handlers = {
-      quit: () => {process.exit();}
+      'quit': () => {
+        process.exit();
+      }
     };
     return (
       <HotKeys keyMap={keyMap} handlers={handlers} innerRef={c => this._hotkeysContainer = c}>

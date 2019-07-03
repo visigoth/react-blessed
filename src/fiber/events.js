@@ -1,5 +1,6 @@
 import * as ScreenEventTypes from './ScreenEventTypes';
 import SyntheticKeyboardEvent from './SyntheticKeyboardEvent';
+import SyntheticFocusEvent from './SyntheticFocusEvent';
 
 const startCase = (string) => (
   string.replace(/(?:^\w|[A-Z]|\b\w|\s+)/g, function(match) {
@@ -45,8 +46,6 @@ const eventRegistrationNameToConfig = {}
 const screenEventTransforms = {
   [ScreenEventTypes.SCREEN_KEYPRESS]: (dispatchConfig, targetInst, eventTarget, ...args) => {
     const [ch, key] = args;
-    console.log(ch);
-    console.log(key);
 
     const eventData = {
       type: ScreenEventTypes.SCREEN_KEYPRESS,
@@ -59,7 +58,8 @@ const screenEventTransforms = {
       ctrlKey: key.ctrl,
       shiftKey: key.shift,
       repeat: false,
-      key: ch
+      key: ch,
+      charCode: ch.charCodeAt(0)
     };
     return SyntheticKeyboardEvent.getPooled(
       dispatchConfig,
@@ -67,12 +67,48 @@ const screenEventTransforms = {
       eventData,
       eventTarget
     );
+  },
+  [ScreenEventTypes.SCREEN_FOCUS]: (dispatchConfig, targetInst, eventTarget, ...args) => {
+    const [old] = args;
+    const eventData = {
+      type: ScreenEventTypes.SCREEN_FOCUS,
+      target: targetInst,
+      bubbles: false,
+      cancelable: false,
+
+      relatedTarget: old
+    };
+    return SyntheticFocusEvent.getPooled(
+      dispatchConfig,
+      targetInst,
+      eventData,
+      eventTarget
+    )
+  },
+  [ScreenEventTypes.SCREEN_BLUR]: (dispatchConfig, targetInst, eventTarget, ...args) => {
+    const [next] = args;
+    const eventData = {
+      type: ScreenEventTypes.SCREEN_BLUR,
+      target: targetInst,
+      bubbles: false,
+      cancelable: false,
+
+      relatedTarget: next
+    };
+    return SyntheticFocusEvent.getPooled(
+      dispatchConfig,
+      targetInst,
+      eventData,
+      eventTarget
+    )
   }
 };
 
 // Pairs of react events and screen native events
 const eventTuples = [
-  ['keyPress', ScreenEventTypes.SCREEN_KEYPRESS]
+  ['keyPress', ScreenEventTypes.SCREEN_KEYPRESS],
+  ['focus', ScreenEventTypes.SCREEN_FOCUS],
+  ['blur', ScreenEventTypes.SCREEN_BLUR]
 ];
 
 function addEventConfiguration(eventName, screenEventType) {
@@ -104,7 +140,8 @@ function ensureListeningTo(root, screenEventType) {
 
   if (!isListening.has(screenEventType)) {
     isListening.add(screenEventType);
-    root.screen.on(screenEventName, dispatchScreenEvent.bind(null, root, screenEventType));
+    root.screen.on(screenEventName, dispatchScreenEvent.bind(null, root, screenEventType, false));
+    root.screen.on('element ' + screenEventName, dispatchScreenEvent.bind(null, root, screenEventType, true));
   }
 }
 
@@ -120,14 +157,14 @@ export function updateEventRegistrations(root, instance, props) {
   }
 }
 
-function dispatchScreenEvent(root, screenEventType, ...args) {
-  if (screenEventType != ScreenEventTypes.SCREEN_KEYPRESS) {
-    return;
-  }
-
+function dispatchScreenEvent(root, screenEventType, firstArgIsTarget, ...args) {
   const dispatchConfig = eventDispatchConfigs[screenEventType];
-  const targetInst = root.screen.focused;
+  const targetInst = firstArgIsTarget ? args.shift() : root.screen.focused;
   const eventTransform = screenEventTransforms[screenEventType];
+
+  if (!eventTransform) {
+    throw new Error('unhandled event: ' + screenEventType);
+  }
   const syntheticEvent = eventTransform(
     dispatchConfig,
     targetInst,
@@ -140,11 +177,13 @@ function dispatchScreenEvent(root, screenEventType, ...args) {
   const bubbleListeners = [];
   var node = targetInst;
   do {
-    if (dispatchConfig.phasedRegistrationNames.captured in node.props) {
-      captureListeners.unshift(node);
-    }
-    if (dispatchConfig.phasedRegistrationNames.bubbled in node.props) {
-      bubbleListeners.push(node);
+    if (node.props) {
+      if (dispatchConfig.phasedRegistrationNames.captured in node.props) {
+        captureListeners.unshift(node);
+      }
+      if (dispatchConfig.phasedRegistrationNames.bubbled in node.props) {
+        bubbleListeners.push(node);
+      }
     }
     node = node.parent;
   } while (node != root);
