@@ -188,7 +188,6 @@ export const createBlessedRenderer = function(blessed) {
       child : Instance | TextInstance
     ) : void {
       parentInstance.remove(child);
-      //child.off('event', child._eventListener);
       child.destroy();
     },
 
@@ -197,7 +196,6 @@ export const createBlessedRenderer = function(blessed) {
       child : Instance | TextInstance
     ) : void {
       parentInstance.remove(child);
-      //child.off('event', child._eventListener);
       child.destroy();
     },
 
@@ -227,14 +225,6 @@ export const createBlessedRenderer = function(blessed) {
     if (!root) {
       root = BlessedReconciler.createContainer(screen);
       roots.set(screen, root);
-
-      // TODO(shaheen): install top level event listener on the screen for all
-      // events that could/should be synthesized.
-      root._eventListener = new ReactBlessedEventListener(root, screen);
-
-      // TODO(shaheen): event listener should implement react capture/bubble algorithm
-      // and emit appropriate react events to elements along the path
-
     }
 
     // render at most every 16ms. Should sync this with the screen refresh rate
