@@ -1,7 +1,7 @@
 /* @flow */
 import type { HostConfig, Reconciler } from 'react-fiber-types';
 import ReactFiberReconciler from 'react-reconciler'
-import eventListener, { ReactBlessedEventListener, updateEventRegistrations } from './events'
+import updateEventRegistrations from './events'
 import update from '../shared/update'
 import solveClass from '../shared/solveClass'
 import debounce from 'lodash/debounce'

@@ -119,18 +119,6 @@ function ensureListeningTo(root, screenEventType) {
   }
 }
 
-export function updateEventRegistrations(root, instance, props) {
-  // TODO(shaheen) remove current registrations not appearing in props
-  for (var propKey in props) {
-    const config = eventRegistrationNameToConfig[propKey];
-    if (config) {
-      config.screenEvents.forEach(screenEventType => {
-        ensureListeningTo(root, screenEventType);
-      });
-    }
-  }
-}
-
 function dispatchScreenEvent(root, screenEventType, firstArgIsTarget, ...args) {
   const targetInst = firstArgIsTarget ? args.shift() : root.screen.focused;
   const eventTransform = screenEventTransforms[screenEventType];
@@ -180,4 +168,16 @@ function dispatchScreenEvent(root, screenEventType, firstArgIsTarget, ...args) {
   });
 }
 
-export default eventListener;
+function updateEventRegistrations(root, instance, props) {
+  // TODO(shaheen) remove current registrations not appearing in props
+  for (var propKey in props) {
+    const config = eventRegistrationNameToConfig[propKey];
+    if (config) {
+      config.screenEvents.forEach(screenEventType => {
+        ensureListeningTo(root, screenEventType);
+      });
+    }
+  }
+}
+
+export default updateEventRegistrations;
