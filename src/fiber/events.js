@@ -180,20 +180,4 @@ function dispatchScreenEvent(root, screenEventType, firstArgIsTarget, ...args) {
   });
 }
 
-export class ReactBlessedEventListener {
-  constructor(root, screen) {
-    this.root = root;
-    this.screen = screen;
-    this._installListeners();
-  }
-
-  _installListeners() {
-  }
-
-  _removeListeners() {
-
-  }
-}
-
 export default eventListener;
-
