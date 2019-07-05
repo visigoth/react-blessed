@@ -6,6 +6,7 @@ import update from '../shared/update'
 import solveClass from '../shared/solveClass'
 import debounce from 'lodash/debounce'
 import injectIntoDevToolsConfig from './devtools'
+import computeLayout from './layout';
 
 const emptyObject = {};
 let runningEffects = [];
@@ -230,7 +231,13 @@ export const createBlessedRenderer = function(blessed) {
     // render at most every 16ms. Should sync this with the screen refresh rate
     // probably if possible
     screen.debouncedRender = debounce(() => screen.render(), 16);
-    BlessedReconciler.updateContainer((element : any), root, null, callback);
+
+    const layoutWrapper = (args) => {
+      computeLayout(root);
+      callback && callback.apply(null, args);
+    };
+
+    BlessedReconciler.updateContainer((element : any), root, null, layoutWrapper);
     screen.debouncedRender();
     return BlessedReconciler.getPublicRootInstance(root);
   }
