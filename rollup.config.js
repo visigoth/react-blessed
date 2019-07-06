@@ -20,7 +20,7 @@ export default {
     }
   ],
   external: [
-    'blessed', 'ws', 'react-devtools-core', 'react-reconciler'
+    'blessed', 'ws', 'react-devtools-core', 'react-reconciler', 'yoga-layout-prebuilt'
   ],
   plugins: [
     babel({

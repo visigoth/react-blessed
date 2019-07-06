@@ -1,5 +1,8 @@
+import Yoga from 'yoga-layout-prebuilt';
+
 function computeLayout(root) {
-  console.log('computing layout');
+  const node = Yoga.Node.create();
+  console.log(node);
 }
 
 export default computeLayout;

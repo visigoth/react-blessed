@@ -57,6 +57,7 @@
   },
   "dependencies": {
     "react": "^16.8.0",
-    "react-reconciler": "^0.20.4"
+    "react-reconciler": "^0.20.4",
+    "yoga-layout-prebuilt": "^1.9.3"
   }
 }
