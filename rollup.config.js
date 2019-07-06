@@ -11,12 +11,18 @@ export default {
     {
       file: pkg.main,
       format: 'cjs',
-      sourcemap: true
+      sourcemap: true,
+      sourcemapPathTransform: relpath => {
+        return '/Users/shaheen/code/fbsource/xplat/jellyfish/node_modules/react-blessed/dist/' + relpath
+      }
     },
     {
       file: pkg.module,
       format: 'es',
-      sourcemap: true
+      sourcemap: true,
+      sourcemapPathTransform: relpath => {
+        return '/Users/shaheen/code/fbsource/xplat/jellyfish/node_modules/react-blessed/dist/' + relpath
+      }
     }
   ],
   external: [

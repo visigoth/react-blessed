@@ -1,12 +1,13 @@
 /* @flow */
 import type { HostConfig, Reconciler } from 'react-fiber-types';
 import ReactFiberReconciler from 'react-reconciler'
+import Yoga from 'yoga-layout-prebuilt'
 import updateEventRegistrations from './events'
 import update from '../shared/update'
 import solveClass from '../shared/solveClass'
 import debounce from 'lodash/debounce'
 import injectIntoDevToolsConfig from './devtools'
-import computeLayout from './layout';
+import buildLayout from './layout';
 
 const emptyObject = {};
 let runningEffects = [];
@@ -220,6 +221,7 @@ export const createBlessedRenderer = function(blessed) {
   BlessedReconciler.injectIntoDevTools(injectIntoDevToolsConfig);
 
   const roots = new Map();
+  const yogaConfig = Yoga.Config.create();
 
   return function render(element, screen, callback) {
     let root = roots.get(screen);
@@ -230,10 +232,13 @@ export const createBlessedRenderer = function(blessed) {
 
     // render at most every 16ms. Should sync this with the screen refresh rate
     // probably if possible
-    screen.debouncedRender = debounce(() => screen.render(), 16);
+    screen.debouncedRender = debounce(() => {
+      buildLayout(screen, root.containerInfo, yogaConfig);
+      screen.render();
+    }, 16);
 
     const layoutWrapper = (args) => {
-      computeLayout(root);
+      buildLayout(screen, root.containerInfo, yogaConfig);
       callback && callback.apply(null, args);
     };
 
