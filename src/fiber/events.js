@@ -121,6 +121,10 @@ function ensureListeningTo(root, screenEventType) {
 
 function dispatchScreenEvent(root, screenEventType, firstArgIsTarget, ...args) {
   const targetInst = firstArgIsTarget ? args.shift() : root.screen.focused;
+  if (!targetInst) {
+    return;
+  }
+
   const eventTransform = screenEventTransforms[screenEventType];
 
   if (!eventTransform) {
