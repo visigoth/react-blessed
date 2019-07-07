@@ -218,6 +218,20 @@ function buildLayoutHelper(yogaConfig, instance) {
   return yogaNode;
 }
 
+function dumpLayout(instance, indent) {
+  const info = _.repeat(' ', indent * 2) +
+    '+-' + instance.toString() +
+    ' [' + instance.yogaNode.getComputedWidth() +
+    ', ' + instance.yogaNode.getComputedHeight() + ']';
+  console.log(info);
+
+  if (instance.children) {
+    instance.children.forEach(child => {
+      dumpLayout(child, indent+1);
+    });
+  }
+}
+
 function buildLayout(screen, rootInstance, yogaConfig) {
   const yogaNode = buildLayoutHelper(yogaConfig, rootInstance);
   yogaNode.setHeight(screen.height);
