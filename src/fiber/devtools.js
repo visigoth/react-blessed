@@ -24,3 +24,11 @@ try {
     console.warn('WARNING: the `ws` package must be installed to use `react-devtools`.');
   }
 }
+
+const devtoolsConfig = {
+  bundleType: process.env.NODE_ENV !== 'production' ? 1 : 0,
+  version: '16.8.6', // pretend renderer version is the official react version of react-reconciler
+  rendererPackageName: "react-blessed",
+  findFiberByHostInstance: () => null,
+};
+export default devtoolsConfig;
