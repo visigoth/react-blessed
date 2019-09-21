@@ -21,6 +21,8 @@ export const createBlessedRenderer = function(blessed) {
     screen: typeof blessed.Screen,
   };
 
+  const customWidgetLibrary = {};
+
   const BlessedReconciler = ReactFiberReconciler({
     supportsMutation: true,
     supportsPersistence: false,
@@ -49,7 +51,8 @@ export const createBlessedRenderer = function(blessed) {
         type = type.slice(blessedTypePrefix.length);
       }
 
-      const instance = blessed[type](appliedProps);
+      const constructor = customWidgetLibrary[type] || blessed[type];
+      const instance = constructor(appliedProps);
       instance.props = props;
 
       return instance;
@@ -223,7 +226,7 @@ export const createBlessedRenderer = function(blessed) {
   const roots = new Map();
   const yogaConfig = Yoga.Config.create();
 
-  return function render(element, screen, callback) {
+  const render = function render(element, screen, callback) {
     let root = roots.get(screen);
     if (!root) {
       root = BlessedReconciler.createContainer(screen);
@@ -246,6 +249,13 @@ export const createBlessedRenderer = function(blessed) {
     screen.debouncedRender();
     return BlessedReconciler.getPublicRootInstance(root);
   }
+
+  return {
+    render: render,
+    registerWidget: (name, constructor) => {
+      customWidgetLibrary[name] = constructor;
+    }
+  };
 }
 
 export function render(element, screen, callback) {
