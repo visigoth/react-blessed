@@ -90,7 +90,7 @@ function applyFlexStyles(yogaNode, props) {
     }
 
     if (direction == 'row') {
-      yogaNode.setFlexDirection();
+      yogaNode.setFlexDirection(Yoga.FLEX_DIRECTION_ROW);
     } else if (direction == 'row-reverse') {
       yogaNode.setFlexDirection(Yoga.FLEX_DIRECTION_ROW_REVERSE);
     } else if (direction == 'column') {
