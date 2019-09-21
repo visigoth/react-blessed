@@ -219,8 +219,18 @@ function buildLayoutHelper(yogaConfig, instance) {
 }
 
 function dumpLayout(instance, indent) {
+  var propsString = "";
+  for (var prop in instance.props) {
+    if (prop == 'children') {
+      continue;
+    }
+    propsString += prop;
+    propsString += "=";
+    propsString += instance.props[prop].toString();
+    propsString += " ";
+  }
   const info = _.repeat(' ', indent * 2) +
-    '+-' + instance.toString() + ' <' + instance.type + '>' +
+    '+-' + instance.toString() + ' <' + instance.type + ' ' + propsString + '>' +
     ' [' + instance.yogaNode.getComputedWidth() +
     ', ' + instance.yogaNode.getComputedHeight() + ']';
   console.log(info);
