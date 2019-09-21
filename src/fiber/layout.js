@@ -220,7 +220,7 @@ function buildLayoutHelper(yogaConfig, instance) {
 
 function dumpLayout(instance, indent) {
   const info = _.repeat(' ', indent * 2) +
-    '+-' + instance.toString() +
+    '+-' + instance.toString() + ' <' + instance.type + '>' +
     ' [' + instance.yogaNode.getComputedWidth() +
     ', ' + instance.yogaNode.getComputedHeight() + ']';
   console.log(info);
