@@ -231,7 +231,9 @@ function dumpLayout(instance, indent) {
   }
   const info = _.repeat(' ', indent * 2) +
     '+-' + instance.toString() + ' <' + instance.type + ' ' + propsString + '>' +
-    ' [' + instance.yogaNode.getComputedWidth() +
+    ' (' + instance.yogaNode.getComputedLeft() +
+    ', ' + instance.yogaNode.getComputedRight() +
+    ') [' + instance.yogaNode.getComputedWidth() +
     ', ' + instance.yogaNode.getComputedHeight() + ']';
   console.log(info);
 
@@ -242,11 +244,35 @@ function dumpLayout(instance, indent) {
   }
 }
 
+function applyLayout(instance) {
+  const yogaNode = instance.yogaNode;
+  instance.position.top = yogaNode.getComputedTop();
+  instance.position.left = yogaNode.getComputedLeft();
+  instance.position.right = yogaNode.getComputedRight();
+  instance.position.bottom = yogaNode.getComputedBottom();
+  instance.position.width = yogaNode.getComputedWidth();
+  instance.position.height = yogaNode.getComputedHeight();
+  instance.padding.left = yogaNode.getComputedPadding(Yoga.EDGE_LEFT);
+  instance.padding.right = yogaNode.getComputedPadding(Yoga.EDGE_RIGHT);
+  instance.padding.top = yogaNode.getComputedPadding(Yoga.EDGE_TOP);
+  instance.padding.bottom = yogaNode.getComputedPadding(Yoga.EDGE_BOTTOM);
+}
+
+function applyLayoutToChildren(instance) {
+  instance.children.forEach(inst => {
+    applyLayout(inst);
+    applyLayoutToChildren(inst);
+  });
+}
+
 function buildLayout(screen, rootInstance, yogaConfig) {
   const yogaNode = buildLayoutHelper(yogaConfig, rootInstance);
   yogaNode.setHeight(screen.height);
   yogaNode.setWidth(screen.width);
   yogaNode.calculateLayout(screen.width, screen.height, Yoga.DIRECTION_LTR);
+  dumpLayout(rootInstance, 0);
+  // The screen's position and size are fixed, so apply layout to its children
+  applyLayoutToChildren(rootInstance);
 }
 
 export default buildLayout;

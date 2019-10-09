@@ -236,12 +236,12 @@ export const createBlessedRenderer = function(blessed) {
     // render at most every 16ms. Should sync this with the screen refresh rate
     // probably if possible
     screen.debouncedRender = debounce(() => {
-      buildLayout(screen, root.containerInfo, yogaConfig);
+      //buildLayout(screen, root.containerInfo, yogaConfig);
       screen.render();
     }, 16);
 
     const layoutWrapper = (args) => {
-      buildLayout(screen, root.containerInfo, yogaConfig);
+      //buildLayout(screen, root.containerInfo, yogaConfig);
       callback && callback.apply(null, args);
     };
 
